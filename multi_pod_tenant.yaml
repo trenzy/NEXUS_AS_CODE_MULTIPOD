@@ -1,0 +1,82 @@
+---
+apic:
+  
+  # Uses Infra Tenant for configuration
+  tenants:
+    - name: infra
+
+      # Uses overlay-1 VRF in Infra tenant
+      vrfs:
+        - name: overlay-1
+      
+      # L3Out configuration
+      l3outs:
+        - name: IPN_L3Out
+          vrf: overlay-1
+          domain: l3dom_ipn
+          multipod: true
+          ospf:
+            area: 0
+            area_type: regular
+          node_profiles:
+            - name: 'ipn_nodes'
+              nodes:
+                # Spine in Pod 1
+                - node_id: 150
+                  pod_id: 1
+                  router_id: 1.2.3.4
+                  router_id_as_loopback: true
+                # Spine in Pod 2
+                - node_id: 250
+                  pod_id: 2
+                  router_id: 4.3.2.1
+                  router_id_as_loopback: true
+              interface_profiles:
+                - name: 'int_prof_150'
+                  ospf:
+                    policy: ospf_policy_ipn
+                  interfaces:
+                    - node_id: 150
+                      pod_id: 1
+                      port: 32
+                      ip: 10.20.30.2/30
+                      vlan: 4
+                      # mtu: 9216
+                      # svi: false
+                - name: 'int_prof_250'
+                  interfaces:
+                    - node_id: 250
+                      pod_id: 2 
+                      port: 32
+                      ip: 40.50.60.2/30
+                      vlan: 4
+                      # mtu: 9216
+                      # svi: false
+          external_endpoint_groups:
+            - name: 'ipnInstP'
+              subnets:
+                - prefix: 0.0.0.0/2
+                - prefix: 128.0.0.0/2
+
+      policies:
+        ospf_interface_policies:
+          - name: ospf_policy_ipn
+            description: OSPF Policy used for IPN setup
+            network_type: p2p
+            mtu_ignore: true
+            advertise_subnet: true
+
+  # Configures > Infra > Policies > Fabric Ext Connection Policies
+  fabric_policies:
+    external_connectivity_policy:
+      name: IPN
+      site_id: 1
+      fabric_id: 1
+      routing_profiles:
+        - name: ipn_routing_profile_sp150
+          subnets:
+            - 10.20.30.1/30
+
+        - name: ipn_routing_profile_sp250
+          subnets:
+            - 40.50.60.1/30

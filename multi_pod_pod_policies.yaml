@@ -1,0 +1,12 @@
+---
+apic:
+  pod_policies:
+    pods:
+      # Change the TEP IP for your Pod
+      - id: 1
+        tep_pool: 10.254.0.0/16
+        data_plane_tep: 10.1.1.1/32
+      # Change the TEP IP for your Pod
+      - id: 2
+        tep_pool: 10.255.0.0/16
+        data_plane_tep: 10.2.2.2/32

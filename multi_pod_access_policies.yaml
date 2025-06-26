@@ -1,0 +1,73 @@
+---
+apic:
+
+  # Configure Access Policies for Multi-Pod
+  access_policies:
+    
+    # Configure VLAN pools
+    vlan_pools:
+      - name: ipn_pool
+        allocation: static
+        ranges:
+          - from: 4
+            description: multi-pod ipn vlan
+    
+    # Configure Routed Domain for L3Out
+    routed_domains:
+      - name: l3dom_ipn
+        vlan_pool: ipn_pool
+
+    # AAEP for Multi-Pod
+    aaeps:
+      - name: aep_ipn
+        routed_domains:
+          - l3dom_ipn
+
+    # Spine interface policy group
+    spine_interface_policy_groups:
+      - name: ipn_spine_policy_group
+        aaep: aep_ipn
+        cdp_policy: cdp-enabled
+        lldp_policy: lldp-enabled
+
+    # Spine interface profiles
+    # Pod 1 - Replace spine number with yours
+    spine_interface_profiles:
+      - name: Spine_150_ifp
+        selectors:
+          - name: Spine_150_ifsel
+            policy_group: ipn_spine_policy_group
+            port_blocks:
+              - name: 'block1'
+                from_port: 32 # Change to port on your spine
+
+    # Pod 2 - replace spine number with yours
+      - name: 'Spine_250_ifp'
+        selectors:
+          - name: Spine_250_ifsel
+            policy_group: ipn_spine_policy_group
+            port_blocks:
+              - name: 'block2'
+                from_port: 32 # Change to port on your spine
+
+    spine_switch_profiles:
+      # One or more Spine policies in Pod 1
+      # Replace with the ID of the spine(s) in Pod 1
+      - name: Spine_150_spinep
+        selectors:
+          - name: Spine_150_sel
+            node_blocks:
+              - name: blockSpine150
+                from: 150
+        interface_profiles:
+          - Spine_150_ifp
+        
+      # One or more Spine policies in Pod 2
+      - name: Spine_250_spinep
+        selectors:
+          - name: Spine_250_sel
+            node_blocks:
+              - name: blockSpine250
+                from: 250
+        interface_profiles:
+          - Spine_250_ifp
