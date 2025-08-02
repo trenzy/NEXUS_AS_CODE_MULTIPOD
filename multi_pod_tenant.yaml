@@ -41,6 +41,9 @@ apic:
                       port: 32
                       ip: 10.20.30.2/30
                       vlan: 4
+                      bgp_peers:
+                        - ip: w.x.y.z/31
+                          remote_as: 64800
                       # mtu: 9216
                       # svi: false
                 - name: 'int_prof_250'
@@ -50,6 +53,9 @@ apic:
                       port: 32
                       ip: 40.50.60.2/30
                       vlan: 4
+                      bgp_peers:
+                        - ip: a.b.c.d/31
+                          remote_as: 64800
                       # mtu: 9216
                       # svi: false
           external_endpoint_groups:
